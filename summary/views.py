@@ -5,8 +5,6 @@ from summary.serializers import SummarizerSerializer
 from summary.summarize import summarize_text, calculate_scores
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from rest_framework import status
-from rest_framework.views import APIView
-import json
 
 
 class SummarizerView(ReadOnlyModelViewSet):
@@ -45,19 +43,23 @@ class SummarizerView(ReadOnlyModelViewSet):
 
         summary = summarize_text(text)
 
-        bert_score = calculate_scores(text, summary)
-
-        serializer = self.get_serializer(
-            data={
-                "text": uploaded_file,
-                "summary": summary,
-                "scores": json.dumps(bert_score),
-            }
-        )
+        scores = calculate_scores(text, summary)
+        try:
+            serializer = self.get_serializer(
+                data={
+                    "text": uploaded_file,
+                    "summary": summary,
+                    "scores": scores,
+                }
+            )
+        except Exception as e:
+            return Response(
+                {"error": f"An error occurred: {str(e)}"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-

@@ -55,9 +55,9 @@ def bert_score(generated_answers, ground_truth) -> BertScoreResult:
     precision, recall, f1_score = scorer.score(generated_answers, ground_truth)
 
     return {
-        "precision": precision.mean(),
-        "recall": recall.mean(),
-        "f1_score": f1_score.mean(),
+        "precision": precision.mean().item(),
+        "recall": recall.mean().item(),
+        "f1_score": f1_score.mean().item(),
     }
 
 

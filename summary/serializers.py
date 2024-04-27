@@ -7,7 +7,7 @@ class SummarizerSerializer(serializers.ModelSerializer):
     text = serializers.FileField(
         required=True,
         allow_empty_file=False,
-        use_url=False,
+        use_url=True,
     )
 
     class Meta:
